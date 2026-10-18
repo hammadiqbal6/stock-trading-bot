@@ -69,8 +69,8 @@ def _simulate_portfolio(
         window = close.iloc[: i + 1]
         targets = strategy.generate_targets(window)
         w = {t.symbol: t.weight for t in targets if t.weight > 0}
-        for sym in close.columns:
-            weights.iloc[i][sym] = w.get(sym, 0.0)
+        row = {sym: float(w.get(sym, 0.0)) for sym in close.columns}
+        weights.iloc[i] = pd.Series(row, index=close.columns)
         # cash residual implicit
 
     asset_rets = close.pct_change().fillna(0.0)

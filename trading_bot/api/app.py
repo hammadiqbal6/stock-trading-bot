@@ -61,8 +61,9 @@ async def trading_error_handler(request: Request, exc: TradingBotError) -> JSONR
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
+        request,
         "index.html",
-        {"request": request, "version": __version__},
+        {"version": __version__},
     )
 
 

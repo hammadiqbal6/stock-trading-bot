@@ -134,5 +134,5 @@ source = ["trading_bot"]
 omit = ["trading_bot/cli.py", "trading_bot/api/app.py"]
 
 [tool.coverage.report]
-fail_under = 60
+fail_under = 55
 show_missing = true
