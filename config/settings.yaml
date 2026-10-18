@@ -1,0 +1,122 @@
+# Default application settings (env vars override via pydantic-settings)
+
+app:
+  name: "AI Stock Trading Bot"
+  version: "0.1.0"
+
+universe:
+  # Diversified ETF + large-cap core universe
+  etfs:
+    - SPY
+    - QQQ
+    - IWM
+    - EFA
+    - EEM
+    - TLT
+    - GLD
+    - XLE
+    - XLF
+    - XLK
+  large_caps:
+    - AAPL
+    - MSFT
+    - GOOGL
+    - AMZN
+    - NVDA
+    - META
+    - JPM
+    - V
+    - UNH
+    - XOM
+    - JNJ
+    - PG
+    - MA
+    - HD
+    - CVX
+
+strategy:
+  name: volatility_scaled_momentum
+  rebalance: weekly  # weekly | monthly
+  lookback_days: 63
+  momentum_lookback_days: 126
+  vol_lookback_days: 21
+  vol_target_annual: 0.12
+  cross_sectional_top_n: 8
+  cross_sectional_weight: 0.30
+  trend_weight: 0.70
+  min_history_days: 252
+  allow_short: false
+
+sentiment:
+  enabled: true
+  lookback_hours: 48
+  block_threshold: -0.55   # strongly negative → block new entries
+  boost_threshold: 0.45    # positive → small size-up
+  boost_factor: 1.15
+  cache_ttl_hours: 6
+  anonymise_entities: true
+  fallback: finbert  # finbert | neutral
+
+ml:
+  enabled: false
+  model: xgboost
+  retrain_every_days: 21
+  walk_forward_train_days: 504
+  walk_forward_test_days: 63
+  feature_windows: [5, 10, 21, 63]
+
+risk:
+  max_position_pct: 0.10
+  max_gross_exposure: 1.0
+  daily_loss_cap_pct: 0.02
+  max_drawdown_pct: 0.15
+  stop_loss_pct: 0.08
+  kill_switch_enabled: true
+  pdt_aware: true
+  min_equity_for_day_trades: 25000
+  fractional_shares: true
+  min_order_notional: 1.0
+
+execution:
+  broker: alpaca
+  order_type: market
+  time_in_force: day
+  slippage_bps: 5
+  commission_bps: 0  # Alpaca equities commission-free; model for realism
+  submit_during_regular_hours_only: true
+
+validation:
+  walk_forward_folds: 5
+  purge_days: 5
+  embargo_days: 2
+  holdout_start: "2024-07-01"  # after typical LLM knowledge cutoffs
+  fee_bps: 5
+  slippage_bps: 5
+  risk_free_rate: 0.04
+  target_sharpe: 0.5
+
+advisory:
+  enabled: false
+  # TradingAgents-style multi-agent LLM research — advisory ONLY
+  never_place_orders: true
+  never_override_risk: true
+  agents:
+    - fundamental
+    - sentiment
+    - technical
+    - risk
+  cache_ttl_hours: 24
+
+scheduler:
+  timezone: America/New_York
+  pre_market_check: "09:00"
+  rebalance_day: mon  # for weekly
+  sentiment_refresh_minutes: 30
+  health_check_minutes: 5
+
+data:
+  primary: alpaca
+  historical_backtest: yfinance
+  bar_size: 1Day
+  adjust_splits: true
+  adjust_dividends: true

@@ -1,0 +1,13 @@
+---
+description: Hard risk and trading safety rules
+globs: ["trading_bot/risk/**", "trading_bot/advisory/**", "trading_bot/services/**", "trading_bot/brokers/**"]
+---
+
+# Risk & safety
+
+- LLM and advisory code MUST NOT call `Broker.submit_order` or mutate `RiskEngine` limits.
+- `AdvisoryConfig.never_place_orders` and `never_override_risk` stay True.
+- Kill switch, daily loss cap, max drawdown, position limits, PDT checks are mandatory.
+- Live trading requires explicit env confirmation; refuse silent live flips.
+- Default broker path is paper; `alpaca_paper=True` unless live gate passed.
+- Market hours: respect `submit_during_regular_hours_only`.

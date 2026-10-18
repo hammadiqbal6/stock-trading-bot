@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meridian — Paper Trading Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand-block">
+      <a class="brand" href="/" aria-label="Meridian home">Meridian</a>
+      <span class="brand-sub">Paper Trading Desk</span>
+    </div>
+    <nav class="topnav" aria-label="Primary">
+      <button type="button" class="nav-link active" data-view="overview">Overview</button>
+      <button type="button" class="nav-link" data-view="signals">Signals</button>
+      <button type="button" class="nav-link" data-view="news">News</button>
+      <button type="button" class="nav-link" data-view="validation">Validation</button>
+      <button type="button" class="nav-link" data-view="risk">Risk</button>
+      <button type="button" class="nav-link" data-view="logs">Logs</button>
+      <button type="button" class="nav-link" data-view="setup">Setup</button>
+    </nav>
+    <div class="topbar-actions">
+      <span id="market-pill" class="status-pill" data-state="unknown">Market…</span>
+      <span id="mode-pill" class="status-pill mode">paper</span>
+      <button type="button" id="btn-run" class="btn primary">Run once</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="view-overview" class="view active">
+      <div class="hero-desk">
+        <div class="hero-copy">
+          <p class="eyebrow">Live desk status</p>
+          <h1 id="equity-hero">—</h1>
+          <p class="lede" id="guidance-hero">Loading account and risk state…</p>
+          <div class="cta-row">
+            <button type="button" class="btn primary" id="btn-run-2">Run cycle</button>
+            <button type="button" class="btn ghost" data-view-jump="setup">Open setup wizard</button>
+          </div>
+        </div>
+        <div class="hero-metrics" aria-label="Key metrics">
+          <div class="metric">
+            <span class="metric-label">Cash</span>
+            <span class="metric-value" id="metric-cash">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Buying power</span>
+            <span class="metric-value" id="metric-bp">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Daily P&amp;L</span>
+            <span class="metric-value" id="metric-daily">—</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Drawdown</span>
+            <span class="metric-value" id="metric-dd">—</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="panel" aria-labelledby="pos-heading">
+        <div class="panel-head">
+          <h2 id="pos-heading">Positions</h2>
+          <p class="panel-note">Broker positions with unrealized P&amp;L</p>
+        </div>
+        <div id="positions-empty" class="empty-state hidden">
+          <p>No open positions.</p>
+          <p class="hint">Run a cycle after market open, or finish Setup if Alpaca keys are missing (paper_sim will still demo).</p>
+        </div>
+        <div class="table-wrap">
+          <table id="positions-table" class="data-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Qty</th>
+                <th>Avg</th>
+                <th>Price</th>
+                <th>Value</th>
+                <th>Unrealized</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-signals" class="view">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Target weights</h2>
+          <p class="panel-note">Volatility-scaled trend + cross-sectional tilt, with sentiment filter notes</p>
+        </div>
+        <div id="signals-empty" class="empty-state hidden">
+          <p>No targets yet.</p>
+          <p class="hint">Click <strong>Run once</strong>. If history download fails, check network / yfinance.</p>
+        </div>
+        <div class="table-wrap">
+          <table id="signals-table" class="data-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Weight</th>
+                <th>Sentiment</th>
+                <th>Blocked</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-news" class="view">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>News sentiment</h2>
+          <p class="panel-note">Finnhub + GDELT → FinBERT / LLM (anonymised). LLM never places orders.</p>
+        </div>
+        <div id="news-list" class="news-list"></div>
+        <div id="news-empty" class="empty-state hidden">
+          <p>No sentiment rows yet.</p>
+          <p class="hint">Enable news in config, add Finnhub key (optional), then run a cycle. GDELT needs no key.</p>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-validation" class="view">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Validation</h2>
+          <p class="panel-note">Walk-forward, holdout after LLM cutoff, fees/slippage, deflated Sharpe / PBO proxy</p>
+        </div>
+        <div class="cta-row">
+          <button type="button" class="btn primary" id="btn-validate">Run sample validation</button>
+          <button type="button" class="btn ghost" id="btn-load-validation">Load latest report</button>
+        </div>
+        <p id="validation-guidance" class="lede compact">Honest accuracy: do not expect &gt;55% daily directional hit-rate OOS.</p>
+        <pre id="validation-json" class="code-block">No report loaded.</pre>
+      </section>
+    </section>
+
+    <section id="view-risk" class="view">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Risk state</h2>
+          <p class="panel-note">Hard limits — advisory/LLM cannot override</p>
+        </div>
+        <dl class="kv" id="risk-kv"></dl>
+        <div class="cta-row">
+          <button type="button" class="btn danger" id="btn-reset-kill">Reset kill switch</button>
+        </div>
+        <p class="hint">Reset requires confirm token <code>RESET_KILL_SWITCH</code> (prompted).</p>
+      </section>
+    </section>
+
+    <section id="view-logs" class="view">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Event log</h2>
+          <p class="panel-note">Recent engine messages</p>
+        </div>
+        <pre id="logs-block" class="code-block">No logs yet.</pre>
+      </section>
+    </section>
+
+    <section id="view-setup" class="view">
+      <section class="panel wizard">
+        <div class="panel-head">
+          <h2>Setup wizard</h2>
+          <p class="panel-note">Actionable guidance for every integration</p>
+        </div>
+        <ol id="setup-steps" class="setup-steps"></ol>
+        <div class="cta-row">
+          <button type="button" class="btn ghost" id="btn-reload">Reload settings</button>
+          <a class="btn ghost" href="/api/health" target="_blank" rel="noopener">API health</a>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <div id="loading" class="loading hidden" aria-hidden="true"><div class="spinner"></div><span>Working…</span></div>
+
+  <footer class="site-foot">
+    <span>Meridian v{{ version }}</span>
+    <span>Paper by default · Live requires explicit confirmation</span>
+  </footer>
+
+  <script src="/static/js/app.js" defer></script>
+</body>
+</html>

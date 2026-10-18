@@ -1,0 +1,13 @@
+---
+description: Testing requirements
+globs: ["tests/**", "trading_bot/**/*.py"]
+---
+
+# Testing
+
+- Unit tests for pure logic (strategy, risk, metrics) with no network.
+- Integration tests mock brokers/APIs (`PaperSimBroker`, httpx mocks).
+- Mark network tests with `@pytest.mark.network` and keep them opt-in.
+- E2E Playwright covers empty/error/loading, setup wizard, mobile width.
+- After strategy/risk changes, run walk-forward on synthetic or sample data.
+- Do not assert unrealistic Sharpe/accuracy in tests.
