@@ -19,7 +19,6 @@ dependencies = [
   "scikit-learn>=1.4.0",
   "xgboost>=2.0.0",
   "ta>=0.11.0",
-  "vectorbt>=0.26.0",
   "pydantic>=2.6.0",
   "pydantic-settings>=2.2.0",
   "fastapi>=0.110.0",
@@ -30,8 +29,7 @@ dependencies = [
   "tenacity>=8.2.0",
   "exchange-calendars>=4.5.0",
   "pandas-market-calendars>=4.4.0",
-  "transformers>=4.38.0",
-  "torch>=2.2.0",
+  "pyyaml>=6.0.0",
   "groq>=0.4.0",
   "structlog>=24.1.0",
   "rich>=13.7.0",
@@ -45,6 +43,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Heavy optional stacks — FinBERT/vectorbt degrade gracefully when absent
+ml-nlp = [
+  "transformers>=4.38.0",
+  "torch>=2.2.0",
+]
+vectorbt = [
+  "vectorbt>=0.26.0",
+]
 dev = [
   "pytest>=8.0.0",
   "pytest-asyncio>=0.23.0",
@@ -58,10 +64,14 @@ dev = [
   "types-python-dateutil>=2.8.0",
   "types-pytz>=2024.1.0",
   "types-aiofiles>=23.2.0",
+  "types-PyYAML>=6.0.0",
 ]
 e2e = [
   "playwright>=1.41.0",
   "pytest-playwright>=0.4.0",
+]
+full = [
+  "ai-stock-trading-bot[ml-nlp,vectorbt,dev,e2e]",
 ]
 
 [project.scripts]
