@@ -1,0 +1,14 @@
+---
+description: Python coding standards for Meridian trading bot
+globs: ["trading_bot/**/*.py", "tests/**/*.py"]
+---
+
+# Coding standards
+
+- Python 3.11+; type hints on public functions; Pydantic models at boundaries.
+- Prefer small pure functions; side effects in services/brokers.
+- Use `structlog` via `get_logger`; include `guidance=` on operational warnings.
+- Raise `TradingBotError` subclasses with actionable `guidance` for UI.
+- Ruff + mypy clean for changed files; pytest for new branches.
+- No bare `except:`; catch specific errors or `Exception` with logging.
+- Keep modules layered — strategies must not import FastAPI; brokers must not import UI.

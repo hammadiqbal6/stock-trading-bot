@@ -1,0 +1,19 @@
+services:
+  trading-bot:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=production
+      - TRADING_MODE=paper
+      - DATA_DIR=/app/data
+      - CACHE_DIR=/app/data/cache
+      - MODEL_DIR=/app/data/models
+      - LOG_DIR=/app/logs
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config:ro
+    restart: unless-stopped
