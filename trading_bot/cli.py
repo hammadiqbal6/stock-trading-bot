@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from trading_bot.config.settings import reload_settings
@@ -66,7 +66,7 @@ def main(argv: list[str] | None = None) -> int:
 
         symbols = settings.yaml.universe.all_symbols
         provider = YFinanceProvider(cache_dir=settings.cache_dir)
-        end = args.end or datetime.utcnow().strftime("%Y-%m-%d")
+        end = args.end or datetime.now(UTC).strftime("%Y-%m-%d")
         logger.info("downloading_history", symbols=len(symbols), start=args.start, end=end)
         close = provider.get_close_panel(symbols, start=args.start, end=end)
         result = run_walk_forward(close, settings)

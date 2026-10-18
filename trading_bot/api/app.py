@@ -128,7 +128,7 @@ async def validation_latest() -> dict[str, Any]:
 async def validation_run() -> dict[str, Any]:
     """Trigger a (potentially slow) validation job synchronously for demo sizes."""
     import json
-    from datetime import datetime
+    from datetime import UTC, datetime
 
     from trading_bot.data.provider import YFinanceProvider
     from trading_bot.validation.walk_forward import run_walk_forward
@@ -137,7 +137,9 @@ async def validation_run() -> dict[str, Any]:
     # Smaller universe for API-triggered runs
     symbols = settings.yaml.universe.etfs[:6] + settings.yaml.universe.large_caps[:6]
     provider = YFinanceProvider(cache_dir=settings.cache_dir)
-    close = provider.get_close_panel(symbols, start="2019-01-01", end=datetime.utcnow().strftime("%Y-%m-%d"))
+    close = provider.get_close_panel(
+        symbols, start="2019-01-01", end=datetime.now(UTC).strftime("%Y-%m-%d")
+    )
     result = run_walk_forward(close, settings)
     payload = result.to_dict()
     out = settings.cache_dir / "validation_report.json"

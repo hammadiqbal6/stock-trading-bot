@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +22,7 @@ def main() -> int:
     setup_logging(settings.log_level)
     symbols = ["SPY", "QQQ", "IWM", "TLT", "GLD", "EFA", "XLE", "AAPL", "MSFT", "JPM"]
     provider = YFinanceProvider(cache_dir=settings.cache_dir)
-    end = datetime.utcnow().strftime("%Y-%m-%d")
+    end = datetime.now(UTC).strftime("%Y-%m-%d")
     print(f"Downloading {symbols} 2019-01-01 → {end} via yfinance…")
     close = provider.get_close_panel(symbols, start="2019-01-01", end=end)
     print(f"Got panel shape={close.shape}")
