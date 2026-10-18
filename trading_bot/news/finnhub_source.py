@@ -63,7 +63,7 @@ class FinnhubNewsSource(NewsSource):
                         continue
                     resp.raise_for_status()
                     data = resp.json()
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:
                     logger.warning("finnhub_fetch_failed", symbol=sym, error=str(exc))
                     continue
                 if not isinstance(data, list):
@@ -99,7 +99,7 @@ class FinnhubNewsSource(NewsSource):
                 "sample": len(arts),
                 "guidance": "Finnhub reachable.",
             }
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             return {
                 "ok": False,
                 "source": self.name,

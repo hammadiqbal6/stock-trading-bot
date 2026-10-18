@@ -46,7 +46,7 @@ class NewsAggregator:
             try:
                 arts = src.fetch(symbols, since=since, limit=limit_per_source)
                 all_arts.extend(arts)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.warning(
                     "news_source_failed",
                     source=src.name,

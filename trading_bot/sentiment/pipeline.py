@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import json
 import time
-from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -63,9 +62,7 @@ class SentimentPipeline:
             )
 
         headlines = [a.headline for a in arts[:10]]
-        cache_key = hashlib.sha256(
-            f"{symbol}|{'||'.join(headlines)}".encode()
-        ).hexdigest()
+        cache_key = hashlib.sha256(f"{symbol}|{'||'.join(headlines)}".encode()).hexdigest()
         cached = self._cache.get(cache_key)
         ttl = self.settings.yaml.sentiment.cache_ttl_hours * 3600
         if cached and time.time() - cached.get("ts", 0) < ttl:
@@ -86,7 +83,7 @@ class SentimentPipeline:
             try:
                 scores = self.llm.score_texts(texts)
                 method = self.llm.name
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.warning(
                     "llm_sentiment_failed_fallback",
                     error=str(exc),
@@ -136,7 +133,7 @@ class SentimentPipeline:
         if self.cache_path.exists():
             try:
                 return json.loads(self.cache_path.read_text(encoding="utf-8"))
-            except Exception:  # noqa: BLE001
+            except Exception:
                 return {}
         return {}
 
@@ -148,5 +145,5 @@ class SentimentPipeline:
                 items = sorted(self._cache.items(), key=lambda x: x[1].get("ts", 0), reverse=True)
                 self._cache = dict(items[:1000])
             self.cache_path.write_text(json.dumps(self._cache), encoding="utf-8")
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning("sentiment_cache_write_failed", error=str(exc))

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -200,7 +200,7 @@ class RiskEngine:
                     OrderRequest(
                         symbol=sym,
                         side=OrderSide.BUY,
-                        qty=qty if self.config.fractional_shares else qty,
+                        qty=qty,
                         notional=None,
                         fractional=self.config.fractional_shares,
                     )

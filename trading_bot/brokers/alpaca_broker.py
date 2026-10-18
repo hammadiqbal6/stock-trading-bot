@@ -73,7 +73,7 @@ class AlpacaBroker(Broker):
     def get_account(self) -> AccountInfo:
         try:
             acct = self._client.get_account()
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise BrokerError(
                 f"Failed to fetch Alpaca account: {exc}",
                 guidance=(
@@ -98,7 +98,7 @@ class AlpacaBroker(Broker):
     def list_positions(self) -> list[Position]:
         try:
             positions = self._client.get_all_positions()
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise BrokerError(
                 f"Failed to list positions: {exc}",
                 guidance="Check Alpaca connectivity and credentials.",
@@ -148,7 +148,7 @@ class AlpacaBroker(Broker):
                     client_order_id=order.client_order_id,
                 )
             result = self._client.submit_order(req)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise BrokerError(
                 f"Order rejected/failed for {order.symbol}: {exc}",
                 guidance=(
@@ -163,7 +163,7 @@ class AlpacaBroker(Broker):
     def cancel_order(self, order_id: str) -> None:
         try:
             self._client.cancel_order_by_id(order_id)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise BrokerError(
                 f"Failed to cancel order {order_id}: {exc}",
                 guidance="Order may already be filled or canceled. Refresh orders list.",
@@ -172,7 +172,7 @@ class AlpacaBroker(Broker):
     def get_order(self, order_id: str) -> OrderResult:
         try:
             result = self._client.get_order_by_id(order_id)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise BrokerError(f"Failed to get order {order_id}: {exc}") from exc
         return self._map_order(result)
 
@@ -188,7 +188,7 @@ class AlpacaBroker(Broker):
         req = GetOrdersRequest(status=status_map.get(status, QueryOrderStatus.OPEN), limit=100)
         try:
             orders = self._client.get_orders(req)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise BrokerError(f"Failed to list orders: {exc}") from exc
         return [self._map_order(o) for o in orders]
 
@@ -204,8 +204,13 @@ class AlpacaBroker(Broker):
                 "guidance": "Alpaca connection healthy.",
             }
         except TradingBotError as exc:
-            return {"ok": False, "broker": self.name, "guidance": exc.guidance, "error": exc.message}
-        except Exception as exc:  # noqa: BLE001
+            return {
+                "ok": False,
+                "broker": self.name,
+                "guidance": exc.guidance,
+                "error": exc.message,
+            }
+        except Exception as exc:
             return {
                 "ok": False,
                 "broker": self.name,

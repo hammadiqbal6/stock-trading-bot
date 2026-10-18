@@ -38,7 +38,7 @@ def build_feature_frame(close: pd.DataFrame, windows: list[int]) -> pd.DataFrame
                 # MACD needs more series — use close only helper
                 macd = ta.trend.MACD(s)
                 feat["macd"] = macd.macd_diff()
-            except Exception:  # noqa: BLE001
+            except Exception:
                 pass
         feat["symbol"] = sym
         feat["fwd_ret"] = s.pct_change().shift(-1)
@@ -94,7 +94,7 @@ class WalkForwardML:
         model = self._make_model()
         try:
             model.fit(X_train, y_train)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning("ml_fit_failed", error=str(exc))
             return {}
         self.model = model
@@ -115,7 +115,7 @@ class WalkForwardML:
                     scores = model.predict(X_latest).astype(float)
             else:
                 scores = model.predict(X_latest).astype(float)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning("ml_predict_failed", error=str(exc))
             return {}
 
@@ -139,7 +139,7 @@ class WalkForwardML:
                     eval_metric="logloss",
                     verbosity=0,
                 )
-            except Exception:  # noqa: BLE001
+            except Exception:
                 logger.warning("xgboost_unavailable_using_sklearn")
         from sklearn.ensemble import GradientBoostingClassifier
 

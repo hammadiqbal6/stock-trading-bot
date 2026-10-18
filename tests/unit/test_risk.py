@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from trading_bot.brokers.base import AccountInfo, Position
 from trading_bot.config.settings import RiskConfig
 from trading_bot.risk.engine import RiskEngine

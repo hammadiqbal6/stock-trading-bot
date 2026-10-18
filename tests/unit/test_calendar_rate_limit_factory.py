@@ -6,14 +6,13 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import pytest
-
 from trading_bot.brokers.factory import get_broker
 from trading_bot.brokers.ibkr_stub import IBKRBrokerStub
 from trading_bot.brokers.paper_sim import PaperSimBroker
 from trading_bot.config.settings import BrokerName, Settings
 from trading_bot.data.calendar import MarketCalendar
 from trading_bot.utils.exceptions import BrokerError
-from trading_bot.utils.rate_limit import RateLimitError, RateLimiter
+from trading_bot.utils.rate_limit import RateLimiter, RateLimitError
 
 
 def test_calendar_session_info() -> None:

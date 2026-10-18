@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from trading_bot.brokers.base import OrderRequest, OrderSide
 from trading_bot.brokers.paper_sim import PaperSimBroker
 from trading_bot.utils.exceptions import InsufficientBuyingPowerError

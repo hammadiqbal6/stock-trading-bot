@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-
 from trading_bot.validation.metrics import (
     deflated_sharpe_ratio,
     performance_metrics,

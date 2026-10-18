@@ -38,9 +38,7 @@ DEFAULT_YAML = ROOT_DIR / "config" / "settings.yaml"
 
 class UniverseConfig(BaseModel):
     etfs: list[str] = Field(default_factory=lambda: ["SPY", "QQQ", "IWM", "TLT", "GLD"])
-    large_caps: list[str] = Field(
-        default_factory=lambda: ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
-    )
+    large_caps: list[str] = Field(default_factory=lambda: ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"])
 
     @property
     def all_symbols(self) -> list[str]:
@@ -338,9 +336,7 @@ class Settings(BaseSettings):
                 "provider": self.llm_provider.value,
                 "configured": (
                     self.llm_provider == LLMProvider.NONE
-                    or (
-                        self.llm_provider == LLMProvider.GROQ and self.has_groq()
-                    )
+                    or (self.llm_provider == LLMProvider.GROQ and self.has_groq())
                     or self.llm_provider == LLMProvider.OLLAMA
                     or (
                         self.llm_provider == LLMProvider.OPENAI_COMPATIBLE

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
-
 from trading_bot.config.settings import Settings, TradingMode
 
 
@@ -12,8 +11,13 @@ def test_paper_default(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
     monkeypatch.chdir(tmp_path)
     (tmp_path / "config").mkdir()
     # use default yaml from repo via absolute path
-    s = Settings(trading_mode="paper", data_dir=tmp_path / "data", cache_dir=tmp_path / "cache",
-                 model_dir=tmp_path / "models", log_dir=tmp_path / "logs")
+    s = Settings(
+        trading_mode="paper",
+        data_dir=tmp_path / "data",
+        cache_dir=tmp_path / "cache",
+        model_dir=tmp_path / "models",
+        log_dir=tmp_path / "logs",
+    )
     assert s.trading_mode == TradingMode.PAPER
     assert s.alpaca_paper is True
     assert s.yaml.advisory.never_place_orders is True
@@ -55,5 +59,8 @@ def test_setup_status_guidance(tmp_path) -> None:
     )
     status = s.setup_status()
     assert status["alpaca"]["required"] is True
-    assert "alpaca.markets" in status["alpaca"]["guidance"].lower() or "Alpaca" in status["alpaca"]["guidance"]
+    assert (
+        "alpaca.markets" in status["alpaca"]["guidance"].lower()
+        or "Alpaca" in status["alpaca"]["guidance"]
+    )
     assert status["gdelt"]["configured"] is True

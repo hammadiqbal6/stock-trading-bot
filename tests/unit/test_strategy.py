@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-
 from trading_bot.config.settings import StrategyConfig
 from trading_bot.strategies.momentum import VolatilityScaledMomentumStrategy
 

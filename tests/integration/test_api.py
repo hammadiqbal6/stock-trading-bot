@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
-
 from trading_bot.api import app as app_module
 from trading_bot.brokers.paper_sim import PaperSimBroker
 from trading_bot.config.settings import Settings

@@ -24,7 +24,7 @@ typecheck: ## Run mypy
 	mypy trading_bot
 
 test: ## Run unit + integration tests
-	pytest tests/unit tests/integration -q
+	pytest tests/unit tests/integration -q --cov=trading_bot --cov-report=term-missing --cov-report=xml
 
 test-unit: ## Unit tests only
 	pytest tests/unit -q
@@ -33,7 +33,7 @@ test-integration: ## Integration tests (mocked externals)
 	pytest tests/integration -q
 
 test-e2e: ## Playwright UI tests
-	pytest tests/e2e -q --browser chromium
+	pytest tests/e2e -q --browser chromium --no-cov
 
 cov: ## Coverage report
 	pytest tests/unit tests/integration --cov=trading_bot --cov-report=term-missing --cov-report=html

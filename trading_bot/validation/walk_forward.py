@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-import numpy as np
 import pandas as pd
 
 from trading_bot.config.settings import Settings, get_settings
@@ -186,9 +185,7 @@ def run_walk_forward(
         "Costs applied (fees+slippage). Do not deploy live without paper-trade concordance.",
     ]
     if dsr.get("dsr", 0) < 0.95:
-        guidance_parts.append(
-            "Deflated Sharpe significance is weak — treat edge as unproven."
-        )
+        guidance_parts.append("Deflated Sharpe significance is weak — treat edge as unproven.")
     if pbo.get("pbo_proxy", 1) > 0.4:
         guidance_parts.append(
             "Elevated overfitting proxy — reduce parameter tinkering; prefer simpler rules."

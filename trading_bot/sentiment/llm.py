@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 SYSTEM_PROMPT = (
     "You are a financial news sentiment classifier. "
     "Given anonymised headlines about COMPANY/TICKER/ENTITY, "
-    "respond with JSON only: {\"score\": <float from -1 to 1>, \"label\": "
+    'respond with JSON only: {"score": <float from -1 to 1>, "label": '
     '"negative"|"neutral"|"positive"}. '
     "Do not invent facts. If unclear, score 0."
 )
@@ -29,12 +29,10 @@ class LLMSentimentProvider(ABC):
     name: str
 
     @abstractmethod
-    def score_texts(self, texts: list[str]) -> list[float]:
-        ...
+    def score_texts(self, texts: list[str]) -> list[float]: ...
 
     @abstractmethod
-    def health_check(self) -> dict[str, Any]:
-        ...
+    def health_check(self) -> dict[str, Any]: ...
 
 
 def _parse_score(content: str) -> float:
@@ -46,7 +44,7 @@ def _parse_score(content: str) -> float:
             data = json.loads(match.group())
             score = float(data.get("score", 0.0))
             return max(-1.0, min(1.0, score))
-    except Exception:  # noqa: BLE001
+    except Exception:
         pass
     lower = content.lower()
     if "positive" in lower:
@@ -88,7 +86,7 @@ class GroqSentimentProvider(LLMSentimentProvider):
                 )
                 content = resp.choices[0].message.content or "0"
                 scores.append(_parse_score(content))
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.warning("groq_failed", error=str(exc))
                 raise LLMProviderError("groq", str(exc)) from exc
         return scores
@@ -97,7 +95,7 @@ class GroqSentimentProvider(LLMSentimentProvider):
         try:
             s = self.score_texts(["COMPANY reported unchanged quarterly results."])
             return {"ok": True, "provider": self.name, "sample_score": s[0]}
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             return {
                 "ok": False,
                 "provider": self.name,
@@ -134,7 +132,7 @@ class OllamaSentimentProvider(LLMSentimentProvider):
                     resp.raise_for_status()
                     content = resp.json().get("message", {}).get("content", "0")
                     scores.append(_parse_score(content))
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:
                     raise LLMProviderError("ollama", str(exc)) from exc
         return scores
 
@@ -147,7 +145,7 @@ class OllamaSentimentProvider(LLMSentimentProvider):
                     "provider": self.name,
                     "guidance": "Ollama reachable." if r.status_code == 200 else "Ollama down.",
                 }
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             return {
                 "ok": False,
                 "provider": self.name,
@@ -193,7 +191,7 @@ class OpenAICompatibleProvider(LLMSentimentProvider):
                         else "0"
                     )
                     scores.append(_parse_score(content))
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:
                     raise LLMProviderError("openai_compatible", str(exc)) from exc
         return scores
 

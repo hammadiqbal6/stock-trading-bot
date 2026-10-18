@@ -56,13 +56,17 @@ flowchart TB
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev,e2e]"
+# Optional heavy stacks: pip install -e ".[ml-nlp,vectorbt]"  # FinBERT + vectorbt
 cp .env.example .env
 # Add ALPACA_API_KEY / ALPACA_SECRET_KEY (paper). Without keys, paper_sim is used.
 
 make api          # http://127.0.0.1:8000
-make test         # unit + integration
+make test         # unit + integration (+ coverage)
+make test-e2e     # Playwright (API must be running)
 make sample-validation
 ```
+
+Screenshots: [`docs/screenshots/`](docs/screenshots/). Sample validation: [`docs/validation/SAMPLE_RESULTS.md`](docs/validation/SAMPLE_RESULTS.md).
 
 Live trading is **off by default**. Enabling it requires `TRADING_MODE=live`, `LIVE_TRADING_ENABLED=true`, and `LIVE_TRADING_CONFIRM=I_UNDERSTAND_THE_RISKS`, plus `ALPACA_PAPER=false`.
 

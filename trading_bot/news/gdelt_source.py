@@ -69,7 +69,7 @@ class GDELTNewsSource(NewsSource):
                         )
                         continue
                     payload = resp.json()
-                except Exception as exc:  # noqa: BLE001
+                except Exception as exc:
                     logger.warning("gdelt_fetch_failed", symbol=sym, error=str(exc))
                     continue
                 docs = payload.get("articles") if isinstance(payload, dict) else None
@@ -111,7 +111,7 @@ class GDELTNewsSource(NewsSource):
                 "sample": len(arts),
                 "guidance": "GDELT reachable (no API key required).",
             }
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             return {
                 "ok": False,
                 "source": self.name,

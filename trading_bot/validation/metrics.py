@@ -123,6 +123,8 @@ def probabilistic_backtest_overfitting(
     }
 
 
-def apply_costs(returns: pd.Series, turnover: pd.Series, *, fee_bps: float, slippage_bps: float) -> pd.Series:
+def apply_costs(
+    returns: pd.Series, turnover: pd.Series, *, fee_bps: float, slippage_bps: float
+) -> pd.Series:
     cost = turnover.abs() * (fee_bps + slippage_bps) / 10_000.0
     return returns - cost.reindex(returns.index).fillna(0.0)

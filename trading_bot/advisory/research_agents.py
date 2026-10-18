@@ -48,7 +48,7 @@ class AdvisoryResearchLayer:
         self.llm = None
         try:
             self.llm = get_llm_provider(self.settings)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.info("advisory_llm_unavailable", error=str(exc))
 
     @property
@@ -105,9 +105,9 @@ class AdvisoryResearchLayer:
             text = prompt
             # Providers expose score_texts; for advisory we ask for JSON via same chat APIs
             if isinstance(self.llm, GroqSentimentProvider):
-                self.llm._limiter.acquire()  # noqa: SLF001
-                resp = self.llm._client.chat.completions.create(  # noqa: SLF001
-                    model=self.llm._model,  # noqa: SLF001
+                self.llm._limiter.acquire()
+                resp = self.llm._client.chat.completions.create(
+                    model=self.llm._model,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": text[:4000]},
@@ -119,7 +119,7 @@ class AdvisoryResearchLayer:
             elif isinstance(self.llm, OllamaSentimentProvider):
                 import httpx
 
-                self.llm._limiter.acquire()  # noqa: SLF001
+                self.llm._limiter.acquire()
                 with httpx.Client(timeout=90.0) as client:
                     r = client.post(
                         f"{self.llm.base}/api/chat",
@@ -137,7 +137,7 @@ class AdvisoryResearchLayer:
             else:
                 content = "{}"
             data = _extract_json(content)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning("advisory_failed", error=str(exc))
             return AdvisoryReport(
                 symbol=symbol,

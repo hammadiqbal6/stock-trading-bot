@@ -12,7 +12,9 @@ from trading_bot.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
-def get_broker(settings: Settings | None = None, *, force: BrokerName | str | None = None) -> Broker:
+def get_broker(
+    settings: Settings | None = None, *, force: BrokerName | str | None = None
+) -> Broker:
     settings = settings or get_settings()
     name = BrokerName(force) if force else settings.yaml.execution.broker
 

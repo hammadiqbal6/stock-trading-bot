@@ -45,15 +45,13 @@ class MarketDataProvider(ABC):
         end: datetime | str | None = None,
     ) -> pd.DataFrame:
         bars = self.get_bars(symbols, start=start, end=end)
-        if isinstance(bars.columns, pd.MultiIndex):
-            if "close" in bars.columns.get_level_values(0):
-                return bars["close"].sort_index()
+        if isinstance(bars.columns, pd.MultiIndex) and "close" in bars.columns.get_level_values(0):
+            return bars["close"].sort_index()
         # assume already close panel
         return bars.sort_index()
 
     @abstractmethod
-    def health_check(self) -> dict[str, Any]:
-        ...
+    def health_check(self) -> dict[str, Any]: ...
 
 
 class YFinanceProvider(MarketDataProvider):
@@ -101,7 +99,7 @@ class YFinanceProvider(MarketDataProvider):
                 threads=True,
                 group_by="ticker",
             )
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise DataError(
                 f"yfinance download failed: {exc}",
                 guidance=(
@@ -125,10 +123,10 @@ class YFinanceProvider(MarketDataProvider):
             return {
                 "ok": ok,
                 "provider": self.name,
-                "rows": int(len(panel)),
+                "rows": len(panel),
                 "guidance": "yfinance reachable." if ok else "Empty response from yfinance.",
             }
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             return {
                 "ok": False,
                 "provider": self.name,
@@ -192,7 +190,7 @@ class AlpacaDataProvider(MarketDataProvider):
             )
             bars = self._client.get_stock_bars(req)
             df = bars.df
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             raise DataError(
                 f"Alpaca bars failed: {exc}",
                 guidance=(
@@ -217,7 +215,7 @@ class AlpacaDataProvider(MarketDataProvider):
                 "feed": self._settings.alpaca_data_feed,
                 "guidance": "Alpaca market data reachable.",
             }
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             return {
                 "ok": False,
                 "provider": self.name,

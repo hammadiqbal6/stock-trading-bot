@@ -33,7 +33,7 @@ class MarketCalendar:
             import exchange_calendars as xcals
 
             self._cal = xcals.get_calendar(calendar_name)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning(
                 "exchange_calendars_unavailable",
                 error=str(exc),
@@ -54,7 +54,9 @@ class MarketCalendar:
                 # exchange_calendars returns tz-aware timestamps
                 no = next_open.to_pydatetime() if hasattr(next_open, "to_pydatetime") else next_open
                 nc = (
-                    next_close.to_pydatetime() if hasattr(next_close, "to_pydatetime") else next_close
+                    next_close.to_pydatetime()
+                    if hasattr(next_close, "to_pydatetime")
+                    else next_close
                 )
                 if is_open:
                     guidance = f"Market open. Regular close around {nc.astimezone(ET):%H:%M %Z}."
@@ -76,7 +78,7 @@ class MarketCalendar:
                     next_close=nc,
                     guidance=guidance,
                 )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.warning("calendar_query_failed", error=str(exc))
 
         return self._fallback(now)
@@ -89,7 +91,7 @@ class MarketCalendar:
         if self._cal is not None:
             try:
                 return bool(self._cal.is_session(d))
-            except Exception:  # noqa: BLE001
+            except Exception:
                 pass
         return d.weekday() < 5
 

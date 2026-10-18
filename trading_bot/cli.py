@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     val.add_argument("--end", default=None)
     val.add_argument("--out", default="data/cache/validation_report.json")
 
-    setup_p = sub.add_parser("setup-check", help="Print onboarding / credentials status")
+    sub.add_parser("setup-check", help="Print onboarding / credentials status")
 
     args = parser.parse_args(argv)
     settings = reload_settings()

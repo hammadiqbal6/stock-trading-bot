@@ -39,7 +39,7 @@ class FinBERTScorer:
         try:
             pipe = self._pipe or _load_pipeline()
             self._pipe = pipe
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning(
                 "finbert_unavailable",
                 error=str(exc),
@@ -55,7 +55,7 @@ class FinBERTScorer:
                 conf = float(result.get("score", 0.0))
                 base = LABEL_MAP.get(label, 0.0)
                 out.append(base * conf if base != 0 else 0.0)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.warning("finbert_score_failed", error=str(exc))
                 out.append(0.0)
         return out

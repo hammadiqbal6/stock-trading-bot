@@ -88,7 +88,9 @@ class TradingEngine:
             symbols = self.settings.yaml.universe.all_symbols
             data = get_data_provider(self.settings, purpose="live")
             end = datetime.now(UTC)
-            start = end - timedelta(days=max(400, self.settings.yaml.strategy.min_history_days + 40))
+            start = end - timedelta(
+                days=max(400, self.settings.yaml.strategy.min_history_days + 40)
+            )
             close = data.get_close_panel(symbols, start=start, end=end)
             close.columns = [str(c).upper() for c in close.columns]
 
@@ -121,7 +123,9 @@ class TradingEngine:
                     TargetPosition(symbol=sym, weight=0.0, reason="stop_loss")
                 ]
 
-            hours_ok = session.is_open or not self.settings.yaml.execution.submit_during_regular_hours_only
+            hours_ok = (
+                session.is_open or not self.settings.yaml.execution.submit_during_regular_hours_only
+            )
             if submit_orders and self.settings.trading_mode in {
                 TradingMode.PAPER,
                 TradingMode.LIVE,
@@ -162,7 +166,9 @@ class TradingEngine:
                     targets=targets,
                     prices=prices,
                 )
-                guidance = f"Dry-run: would submit {len(decision.orders)} orders. {decision.guidance}"
+                guidance = (
+                    f"Dry-run: would submit {len(decision.orders)} orders. {decision.guidance}"
+                )
 
             # Advisory (never affects orders)
             if self.advisory.enabled:
@@ -183,7 +189,7 @@ class TradingEngine:
             try:
                 account = self.broker.get_account()
                 positions = self.broker.list_positions()
-            except Exception:  # noqa: BLE001
+            except Exception:
                 account = None
                 positions = []
         except TradingBotError as exc:
@@ -193,10 +199,10 @@ class TradingEngine:
             try:
                 account = self.broker.get_account()
                 positions = self.broker.list_positions()
-            except Exception:  # noqa: BLE001
+            except Exception:
                 account = None
                 positions = []
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             ok = False
             guidance = f"Unexpected error: {exc}. Check logs and Setup wizard."
             self.log(f"UNEXPECTED {exc}")
@@ -223,34 +229,54 @@ class TradingEngine:
         return snap
 
     def status(self) -> TradingSnapshot:
-        if self.last_snapshot:
-            # refresh account/risk lightly
-            try:
-                account = self.broker.get_account()
-                positions = self.broker.list_positions()
-                self.risk.update_equity(account)
-                self.last_snapshot.account = account.model_dump()
-                self.last_snapshot.positions = [p.model_dump() for p in positions]
-                self.last_snapshot.risk = self.risk.snapshot()
-                self.last_snapshot.market = {
-                    **self.last_snapshot.market,
-                    **{
-                        "is_open": self.calendar.is_open(),
-                        "guidance": self.calendar.session_info().guidance,
-                    },
-                }
-            except Exception as exc:  # noqa: BLE001
-                self.last_snapshot.guidance = f"Status refresh issue: {exc}"
-            return self.last_snapshot
         session = self.calendar.session_info()
+        market = {
+            "is_open": session.is_open,
+            "is_trading_day": session.is_trading_day,
+            "now_et": session.now_et.isoformat(),
+            "next_open": session.next_open.isoformat() if session.next_open else None,
+            "next_close": session.next_close.isoformat() if session.next_close else None,
+            "guidance": session.guidance,
+        }
+        account_dict: dict[str, Any] = {}
+        positions_list: list[dict[str, Any]] = []
+        try:
+            account = self.broker.get_account()
+            positions = self.broker.list_positions()
+            self.risk.update_equity(account)
+            account_dict = account.model_dump()
+            positions_list = [p.model_dump() for p in positions]
+        except Exception as exc:
+            guidance = f"Status refresh issue: {exc}"
+            if self.last_snapshot:
+                self.last_snapshot.guidance = guidance
+                self.last_snapshot.market = {**self.last_snapshot.market, **market}
+                return self.last_snapshot
+            return TradingSnapshot(
+                ts=datetime.now(UTC),
+                mode=self.settings.trading_mode.value,
+                market=market,
+                setup=self.settings.setup_status(),
+                risk=self.risk.snapshot(),
+                guidance=guidance,
+                logs=self._event_log[-50:],
+                ok=False,
+            )
+
+        if self.last_snapshot:
+            self.last_snapshot.account = account_dict
+            self.last_snapshot.positions = positions_list
+            self.last_snapshot.risk = self.risk.snapshot()
+            self.last_snapshot.market = {**self.last_snapshot.market, **market}
+            self.last_snapshot.setup = self.settings.setup_status()
+            return self.last_snapshot
+
         return TradingSnapshot(
             ts=datetime.now(UTC),
             mode=self.settings.trading_mode.value,
-            market={
-                "is_open": session.is_open,
-                "guidance": session.guidance,
-                "now_et": session.now_et.isoformat(),
-            },
+            market=market,
+            account=account_dict,
+            positions=positions_list,
             setup=self.settings.setup_status(),
             risk=self.risk.snapshot(),
             guidance="No cycle run yet — use Run Once or wait for scheduler.",
